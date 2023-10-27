@@ -31,7 +31,7 @@ public class Sessao {
     private LocalDateTime inicioSessao = LocalDateTime.now();
     @Column(name = "finalSessao")
     private LocalDateTime finalSessao = inicioSessao.plusMinutes(1);    
-    @OneToMany(mappedBy = "sessaoVotacao", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "sessao", cascade = {CascadeType.ALL})
     private List<Voto> votos;
 
 }

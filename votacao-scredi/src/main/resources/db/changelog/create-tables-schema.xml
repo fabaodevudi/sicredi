@@ -6,19 +6,58 @@
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-	<changeSet id="01" author="Fabao">
-		<createTable tableName="pauta">
-			<column name="id_pauta" type="int" autoIncrement="true">
-				<constraints nullable="false" unique="true"
-					primaryKey="true" />
-			</column>
-			<column name="titulo" type="varchar(100)">
-				<constraints nullable="false" unique="true"/>
-			</column>
-			<column name="descricao" type="varchar(100)">
-				<constraints nullable="false" unique="true"/>
-			</column>
-		</createTable>
+	 <changeSet author="Fabao" id="1_createTablePauta" failOnError="true">
 		
-	</changeSet>
+        <comment>Criação da tabela PAUTA</comment>
+        <sql>
+			create table PAUTA (
+				ID_PAUTA NUMBER(20),
+				TITULO VARCHAR(100),
+				DESCRICAO VARCHAR(100),
+				PRIMARY KEY (ID_PAUTA)
+			)
+		</sql>
+    </changeSet>
+    
+    <changeSet author="Fabao" id="2_createTableAssociado" failOnError="true">
+		
+        <comment>Criação da tabela ASSOCIADO</comment>
+        <sql>
+			create table ASSOCIADO (
+				ID_ASSOCIADO NUMBER(20),
+				NOME VARCHAR(100),
+				CPF VARCHAR(11),
+				PRIMARY KEY (ID_ASSOCIADO)
+			)
+		</sql>
+    </changeSet>
+    <changeSet author="Fabao" id="3_createTableSessao" failOnError="true">
+		
+        <comment>Criação da tabela SESSAO</comment>
+        <sql>
+			create table SESSAO (
+				ID_SESSAO NUMBER(20),
+				INICIO_SESSAO DATE,
+				FIM_SESSAO DATE,
+				ID_PAUTA NUMBER(20),
+				PRIMARY KEY (ID_SESSAO),
+				FOREIGN KEY (ID_PAUTA) REFERENCES PAUTA(ID_PAUTA)
+			)
+		</sql>
+    </changeSet>
+    <changeSet author="Fabao" id="3_createTableVoto" failOnError="true">
+		
+        <comment>Criação da tabela VOTO</comment>
+        <sql>
+			create table VOTO (
+				ID_VOTO NUMBER(20),				
+				VOTO VARCHAR(1),
+				ID_SESSAO NUMBER(20),
+				ID_ASSOCIADO NUMBER(20),
+				PRIMARY KEY (ID_VOTO),
+				FOREIGN KEY (ID_SESSAO) REFERENCES SESSAO(ID_SESSAO),
+				FOREIGN KEY (ID_ASSOCIADO) REFERENCES ASSOCIADO(ID_ASSOCIADO)				
+			)
+		</sql>
+    </changeSet>
 </databaseChangeLog>

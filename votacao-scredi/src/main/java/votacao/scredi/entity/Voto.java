@@ -22,11 +22,15 @@ public class Voto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    
     @Enumerated(EnumType.STRING)
-    private VotoEnum votoEnum;
+    @Column(nullable = false, unique = false)
+    private VotoEnum voto;
+    
     @ManyToOne
     @JoinColumn(name = "id_sessao")
     private Sessao sessao;
+    
     @ManyToOne
     @JoinColumn(name = "id_associado")
     private Associado associado;
