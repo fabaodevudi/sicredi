@@ -11,10 +11,9 @@
         <comment>Criação da tabela PAUTA</comment>
         <sql>
 			create table PAUTA (
-				ID_PAUTA NUMBER(20),
+				ID_PAUTA NUMBER(20) PRIMARY KEY auto_increment,
 				TITULO VARCHAR(100),
-				DESCRICAO VARCHAR(100),
-				PRIMARY KEY (ID_PAUTA)
+				DESCRICAO VARCHAR(100) 
 			)
 		</sql>
     </changeSet>
@@ -24,10 +23,9 @@
         <comment>Criação da tabela ASSOCIADO</comment>
         <sql>
 			create table ASSOCIADO (
-				ID_ASSOCIADO NUMBER(20),
+				ID_ASSOCIADO NUMBER(20) PRIMARY KEY auto_increment,
 				NOME VARCHAR(100),
-				CPF VARCHAR(11),
-				PRIMARY KEY (ID_ASSOCIADO)
+				CPF VARCHAR(11)
 			)
 		</sql>
     </changeSet>
@@ -36,11 +34,10 @@
         <comment>Criação da tabela SESSAO</comment>
         <sql>
 			create table SESSAO (
-				ID_SESSAO NUMBER(20),
+				ID_SESSAO NUMBER(20) PRIMARY KEY auto_increment,
 				INICIO_SESSAO DATE,
 				FIM_SESSAO DATE,
-				ID_PAUTA NUMBER(20),
-				PRIMARY KEY (ID_SESSAO),
+				ID_PAUTA NUMBER(20),			
 				FOREIGN KEY (ID_PAUTA) REFERENCES PAUTA(ID_PAUTA)
 			)
 		</sql>
@@ -50,11 +47,10 @@
         <comment>Criação da tabela VOTO</comment>
         <sql>
 			create table VOTO (
-				ID_VOTO NUMBER(20),				
+				ID_VOTO NUMBER(20) PRIMARY KEY auto_increment,				
 				VOTO VARCHAR(1),
 				ID_SESSAO NUMBER(20),
-				ID_ASSOCIADO NUMBER(20),
-				PRIMARY KEY (ID_VOTO),
+				ID_ASSOCIADO NUMBER(20),				
 				FOREIGN KEY (ID_SESSAO) REFERENCES SESSAO(ID_SESSAO),
 				FOREIGN KEY (ID_ASSOCIADO) REFERENCES ASSOCIADO(ID_ASSOCIADO)				
 			)

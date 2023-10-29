@@ -9,7 +9,7 @@ import votacao.scredi.exception.PautaException;
 public class PautaControllerImpl implements PautaController {
 
 	@Override
-	public ResponseEntity<?> create(PautaDTO pauta) throws PautaException {
+	public ResponseEntity<?> criar(PautaDTO pauta) throws PautaException {
 		// TODO Auto-generated method stub
 		return null;
 	}
