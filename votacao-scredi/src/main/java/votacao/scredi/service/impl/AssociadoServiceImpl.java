@@ -1,11 +1,14 @@
 package votacao.scredi.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import votacao.scredi.entity.Associado;
+import votacao.scredi.exception.AssociadoNaoExisteException;
+import votacao.scredi.exception.AssociadoExisteException;
 import votacao.scredi.repository.AssociadoRepository;
 import votacao.scredi.service.AssociadoService;
 
@@ -22,25 +25,33 @@ public class AssociadoServiceImpl implements AssociadoService {
 
 	@Override
 	public Associado obterPorId(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		return rep.findById(id).orElseThrow(() -> new AssociadoNaoExisteException("Associado inexistente"));
 	}
 
 	@Override
 	public void criar(Associado associado) {
+		rep.findByCpf(associado.getCpf()).ifPresent(item -> {
+			throw new AssociadoExisteException("Associado já existente com Cpf: " + associado.getCpf());
+        });		
+		
 		rep.save(associado);		
 	}
 
 	@Override
-	public void deletar(Long id) {
-		// TODO Auto-generated method stub
-		
+	public void deletar(Long id) {		
+		obterPorId(id);
+		rep.deleteById(id);		
 	}
 
 	@Override
 	public Associado obterPorCpf(String cpf) {
-		// TODO Auto-generated method stub
-		return null;
+		Optional<Associado> associado = rep.findByCpf(cpf);
+		
+		if (!associado.isPresent()) {
+			throw new AssociadoNaoExisteException("Usuário inexistente");
+		}
+		
+		return associado.get();
 	}
 
 }

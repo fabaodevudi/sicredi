@@ -10,7 +10,8 @@ import org.springframework.stereotype.Controller;
 
 import votacao.scredi.controller.AssociadoController;
 import votacao.scredi.dto.AssociadoDTO;
-import votacao.scredi.exception.AssociadoException;
+import votacao.scredi.exception.AssociadoExisteException;
+import votacao.scredi.exception.AssociadoNaoExisteException;
 import votacao.scredi.service.AssociadoService;
 
 @Controller
@@ -20,15 +21,27 @@ public class AssociadoControllerImpl implements AssociadoController {
 	AssociadoService service;
 
 	@Override
-	public ResponseEntity<?> criar(AssociadoDTO dto) throws AssociadoException {
+	public ResponseEntity<?> criar(AssociadoDTO dto) throws AssociadoExisteException {
 		service.criar(AssociadoDTO.fromDTO(dto));
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
 	@Override
-	public ResponseEntity<?> listar() throws AssociadoException {
+	public ResponseEntity<?> listar() throws AssociadoExisteException {
 		List<AssociadoDTO> lista = service.listar().stream().map(item -> AssociadoDTO.fromEntity(item)).collect(Collectors.toList());
 		return new ResponseEntity<>(lista, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<?> deletar(Long id) throws AssociadoNaoExisteException {
+		service.deletar(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	
+	@Override
+	public ResponseEntity<?> obterPorCPF(String cpf) throws AssociadoNaoExisteException {		
+		return new ResponseEntity<>(service.obterPorCpf(cpf), HttpStatus.OK);		
 	}
 
 }
