@@ -37,7 +37,6 @@ public class AssociadoControllerImpl implements AssociadoController {
 		service.deletar(id);
 		return ResponseEntity.noContent().build();
 	}
-
 	
 	@Override
 	public ResponseEntity<?> obterPorCPF(String cpf) throws AssociadoNaoExisteException {		

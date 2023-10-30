@@ -1,4 +1,7 @@
 databaseChangeLog:
   - include:
       file: db/changelog/create-tables-schema.xml
-  
+  - include:
+      file: db/changelog/insert-associados.xml
+  - include:
+      file: db/changelog/insert-pautas.xml

@@ -9,6 +9,5 @@ import votacao.scredi.entity.Pauta;
 
 @Repository
 public interface PautaRepository extends CrudRepository<Pauta, Long> {
-	Optional<Pauta> findByTitulo(String titulo);
-
+	Optional<Pauta> findByTitulo(String titulo);	
 }

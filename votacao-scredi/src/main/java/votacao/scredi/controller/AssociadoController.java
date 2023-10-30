@@ -29,6 +29,6 @@ public interface AssociadoController {
 	@DeleteMapping("/{id}")
 	ResponseEntity<?> deletar(@PathVariable Long id) throws AssociadoNaoExisteException;
 	
-	@GetMapping("/{cpf}")
+	@GetMapping("/buscar/{cpf}")
 	ResponseEntity<?> obterPorCPF(@PathVariable String cpf) throws AssociadoNaoExisteException;
 }

@@ -27,11 +27,15 @@ public class Sessao {
     @OneToOne
     @JoinColumn(name = "id_pauta")
     private Pauta pauta;
-    @Column(name = "inicioSessao")
+    @Column
     private LocalDateTime inicioSessao = LocalDateTime.now();
-    @Column(name = "finalSessao")
+    @Column
     private LocalDateTime finalSessao = inicioSessao.plusMinutes(1);    
     @OneToMany(mappedBy = "sessao", cascade = {CascadeType.ALL})
-    private List<Voto> votos;
+    private List<Voto> votos;    
+    
+    public Sessao(Pauta pauta) {
+    	this.pauta = pauta;
+    }
 
 }

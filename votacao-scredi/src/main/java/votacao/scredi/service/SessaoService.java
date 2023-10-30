@@ -6,11 +6,12 @@ import org.springframework.stereotype.Service;
 
 import votacao.scredi.entity.Pauta;
 import votacao.scredi.entity.Sessao;
+import votacao.scredi.entity.Voto;
 
 @Service
 public interface SessaoService {
 	List<Sessao> listar();
-	Pauta obterPorId(Long id);
+	Sessao obterPorId(Long id);
 	void criar(Pauta pauta);
-	void deletar(Long id);
+	void votar(Long idSessao, Voto voto);
 }

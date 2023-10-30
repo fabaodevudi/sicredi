@@ -1,4 +1,4 @@
-package votacao.scredi;
+package votacao.scredi.controller;
 
 
 import static org.mockito.Mockito.doNothing;
@@ -55,7 +55,7 @@ public class AssociadoControllerTest {
 	}
 
 	@Test
-	@DisplayName("Deve retornar 422 na criação")
+	@DisplayName("Deve retornar 422 na criação se associado existe")
 	void deveRetornar422CasoUsuarioExista() throws Exception {
 		String jsonBody = new Gson().toJson(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoSemId().getAssociado()));
 
@@ -98,7 +98,7 @@ public class AssociadoControllerTest {
 		
         when(service.obterPorCpf(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()).getCpf())).thenReturn(AssociadoBuilder.fabaoId1().getAssociado());
 
-		mockMvc.perform(get(String.format("/associados/%s", AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
+		mockMvc.perform(get(String.format("/associados/buscar/%s", AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isOk());
@@ -111,7 +111,7 @@ public class AssociadoControllerTest {
 		
 		doThrow(AssociadoNaoExisteException.class).when(service).obterPorCpf("555555555555");
 
-		mockMvc.perform(get(String.format("/associados/%s", "555555555555")))
+		mockMvc.perform(get(String.format("/associados/buscar/%s", "555555555555")))
 		.andExpect(status().isNotFound());
 		verify(service,times(1)).obterPorCpf("555555555555");
 	}
