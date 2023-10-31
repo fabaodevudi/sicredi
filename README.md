@@ -1,3 +1,11 @@
+Tecnologias:
+Java 17
+Springframework 3.1.15
+Lombok
+Junit/Mockito
+Liquibase
+MySQL
+
 No cooperativismo, cada associado possui um voto e as decisões são tomadas em assembleias, por votação. Imagine que você deve criar uma solução para dispositivos móveis para gerenciar e participar dessas sessões de votação. Essa solução deve ser executada na nuvem e promover as seguintes funcionalidades através de uma API REST:
 
 Cadastrar uma nova pauta
