@@ -41,6 +41,7 @@ public class SessaoVotoControllerImpl implements SessaoVotoController {
 
 	@Override
 	public ResponseEntity<?> votar(Long id, VotoDTO voto) {
+		service.votar(id, VotoDTO.fromDTO(voto));
 		return ResponseEntity.status(HttpStatus.CREATED).build();	
 	}
 	

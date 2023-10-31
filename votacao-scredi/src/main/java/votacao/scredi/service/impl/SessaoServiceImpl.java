@@ -1,16 +1,19 @@
 package votacao.scredi.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import votacao.scredi.entity.Associado;
 import votacao.scredi.entity.Pauta;
 import votacao.scredi.entity.Sessao;
 import votacao.scredi.entity.Voto;
-import votacao.scredi.exception.PautaNaoExisteException;
+import votacao.scredi.exception.SessaoException;
 import votacao.scredi.exception.SessaoNaoExisteException;
 import votacao.scredi.repository.SessaoRepository;
+import votacao.scredi.repository.VotoRepository;
 import votacao.scredi.service.AssociadoService;
 import votacao.scredi.service.PautaService;
 import votacao.scredi.service.SessaoService;
@@ -20,6 +23,9 @@ public class SessaoServiceImpl implements SessaoService {
 
 	@Autowired
 	SessaoRepository rep;
+	
+	@Autowired
+	VotoRepository votoRep;
 	
 	@Autowired
 	PautaService pautaRep;
@@ -46,8 +52,22 @@ public class SessaoServiceImpl implements SessaoService {
 
 	@Override
 	public void votar(Long idSessao, Voto voto) {
-		// TODO Auto-generated method stub
+		LocalDateTime fim = LocalDateTime.now();
+		Sessao sessao = obterPorId(idSessao);
 		
+		if (fim.isAfter(sessao.getFinalSessao())) {
+			throw new SessaoException("Sessão já está encerrada");
+		}
+		
+		Associado associado = associadoRep.obterPorCpf(voto.getAssociado().getCpf());		
+		
+		if (sessao.getVotos().stream().anyMatch(item -> item.getAssociado().getCpf().equals(associado.getCpf()))) {			
+			throw new SessaoException("O associado já votou.");
+		}
+		
+		voto.setSessao(sessao);
+		voto.setAssociado(associado);
+		votoRep.save(voto);				
 	}
 
 }

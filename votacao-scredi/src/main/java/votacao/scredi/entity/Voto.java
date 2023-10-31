@@ -20,7 +20,7 @@ import votacao.scredi.enumerate.VotoEnum;
 public class Voto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id_voto")
     private Long id;
     
     @Enumerated(EnumType.STRING)

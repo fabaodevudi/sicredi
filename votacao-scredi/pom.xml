@@ -15,6 +15,7 @@
 	<description>Votação</description>
 	<properties>
 		<java.version>17</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -32,7 +33,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>			
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -54,12 +55,7 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>			
 			<version>1.10.19</version>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
@@ -81,6 +77,12 @@
 		    <groupId>com.google.code.gson</groupId>
 		    <artifactId>gson</artifactId>		   
 		</dependency>
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>8.0.33</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
@@ -99,5 +101,6 @@
 			</plugin>
 		</plugins>
 	</build>
+	
 
 </project>
