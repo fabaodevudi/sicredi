@@ -22,16 +22,16 @@ import votacao.scredi.service.SessaoService;
 public class SessaoServiceImpl implements SessaoService {
 
 	@Autowired
-	SessaoRepository rep;
+	private SessaoRepository rep;
 	
 	@Autowired
-	VotoRepository votoRep;
+	private VotoRepository votoRep;
 	
 	@Autowired
-	PautaService pautaRep;
+	private PautaService pautaRep;
 	
 	@Autowired
-	AssociadoService associadoRep;	
+	private AssociadoService associadoRep;	
 	
 	@Override
 	public List<Sessao> listar() {
@@ -45,7 +45,7 @@ public class SessaoServiceImpl implements SessaoService {
 
 	@Override
 	public void criar(Pauta pauta) {
-		pautaRep.obterPorId(pauta.getId());		
+		pautaRep.obterPorId(pauta.getId());
 		Sessao sessao = new Sessao(pauta);
 		rep.save(sessao);		
 	}
@@ -61,7 +61,7 @@ public class SessaoServiceImpl implements SessaoService {
 		
 		Associado associado = associadoRep.obterPorCpf(voto.getAssociado().getCpf());		
 		
-		if (sessao.getVotos().stream().anyMatch(item -> item.getAssociado().getCpf().equals(associado.getCpf()))) {			
+		if (sessao.getVotos() != null && sessao.getVotos().stream().anyMatch(item -> item.getAssociado().getCpf().equals(associado.getCpf()))) {			
 			throw new SessaoException("O associado já votou.");
 		}
 		

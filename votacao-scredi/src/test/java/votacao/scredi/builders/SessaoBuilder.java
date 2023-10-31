@@ -9,7 +9,7 @@ public class SessaoBuilder {
 	private static final LocalDateTime INICIO = LocalDateTime.now();
     private static final LocalDateTime FIM = INICIO.plusMinutes(1);
     
-    private Sessao sessao = new Sessao();
+    private Sessao sessao;
     
     public static SessaoBuilder abreSessaoPautaAumentoSalario() {
     	SessaoBuilder sessao = new SessaoBuilder();

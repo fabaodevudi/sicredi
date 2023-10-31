@@ -1,16 +1,11 @@
 package votacao.scredi.dto;
 
 import java.time.LocalDateTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import votacao.scredi.entity.Pauta;
 import votacao.scredi.entity.Sessao;
 
 @Data
@@ -21,6 +16,7 @@ public class SessaoDTO {
     private PautaDTO pauta;
     private LocalDateTime inicioSessao = LocalDateTime.now();
     private LocalDateTime finalSessao = inicioSessao.plusMinutes(1);
+    private List<VotoDTO> votos;
     
     public static SessaoDTO fromEntity(Sessao entity) {
     	SessaoDTO dto = new SessaoDTO();
@@ -28,6 +24,7 @@ public class SessaoDTO {
     	dto.setInicioSessao(entity.getInicioSessao());
     	dto.setFinalSessao(entity.getFinalSessao());
     	dto.setPauta(PautaDTO.fromEntity(entity.getPauta()));
+    	dto.setVotos(entity.getVotos().stream().map(item -> VotoDTO.fromEntity(item)).collect(Collectors.toList()));
     	return dto;
     }
     
@@ -37,6 +34,7 @@ public class SessaoDTO {
     	entity.setInicioSessao(dto.getInicioSessao());
     	entity.setFinalSessao(dto.getFinalSessao());
     	entity.setPauta(PautaDTO.fromDTO(dto.getPauta()));
+    	entity.setVotos(dto.getVotos().stream().map(item -> VotoDTO.fromDTO(item)).collect(Collectors.toList()));
     	return entity;
     }
     
