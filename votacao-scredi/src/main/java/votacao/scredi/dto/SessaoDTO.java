@@ -1,6 +1,7 @@
 package votacao.scredi.dto;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +25,8 @@ public class SessaoDTO {
     	dto.setInicioSessao(entity.getInicioSessao());
     	dto.setFinalSessao(entity.getFinalSessao());
     	dto.setPauta(PautaDTO.fromEntity(entity.getPauta()));
-    	dto.setVotos(entity.getVotos().stream().map(item -> VotoDTO.fromEntity(item)).collect(Collectors.toList()));
-    	return dto;
+		dto.setVotos(entity.getVotos() != null ? entity.getVotos().stream().map(VotoDTO::fromEntity).collect(Collectors.toList()) : List.of());
+		return dto;
     }
     
     public static Sessao fromDTO(SessaoDTO dto) {
@@ -34,8 +35,8 @@ public class SessaoDTO {
     	entity.setInicioSessao(dto.getInicioSessao());
     	entity.setFinalSessao(dto.getFinalSessao());
     	entity.setPauta(PautaDTO.fromDTO(dto.getPauta()));
-    	entity.setVotos(dto.getVotos().stream().map(item -> VotoDTO.fromDTO(item)).collect(Collectors.toList()));
-    	return entity;
+		entity.setVotos(dto.getVotos() != null ? dto.getVotos().stream().map(VotoDTO::fromDTO).collect(Collectors.toList()) : Collections.emptyList());
+		return entity;
     }
     
 

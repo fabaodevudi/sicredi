@@ -1,9 +1,11 @@
 package votacao.scredi.builders;
 
-import java.time.LocalDateTime;
-
+import lombok.Getter;
 import votacao.scredi.entity.Sessao;
 
+import java.time.LocalDateTime;
+
+@Getter
 public class SessaoBuilder {
 	
 	private static final LocalDateTime INICIO = LocalDateTime.now();
@@ -21,10 +23,5 @@ public class SessaoBuilder {
     	
     	return sessao;
     }
-    
-    
-    public Sessao getSessao() {
-    	return sessao;
-    }
-    
+
 }

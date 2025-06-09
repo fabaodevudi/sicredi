@@ -1,7 +1,9 @@
 package votacao.scredi.builders;
 
+import lombok.Getter;
 import votacao.scredi.entity.Voto;
 
+@Getter
 public class VotoBuilder {
 	
 	private Voto voto;
@@ -12,12 +14,9 @@ public class VotoBuilder {
 		voto.voto.setAssociado(AssociadoBuilder.fabaoId1().getAssociado());
 		voto.voto.setId(1L);
 		voto.voto.setSessao(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao());
+
 		return voto;
 	}
 	
-	
-	public Voto getVoto() {
-		return voto;
-	}
-	
+
 }
