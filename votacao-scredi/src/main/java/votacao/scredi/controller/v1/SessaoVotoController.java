@@ -1,4 +1,4 @@
-package votacao.scredi.controller;
+package votacao.scredi.controller.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,8 +21,8 @@ import votacao.scredi.service.SessaoService;
 
 
 @RestController
-@RequestMapping(path = "/sessoes", produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "Sessões de Votação e Votos", description = "Operações relacionadas a sessões de votação e registro de votos.")
+@RequestMapping(path = "/v1/sessoes", produces = MediaType.APPLICATION_JSON_VALUE) // Adicionado o '/v1'
+@Tag(name = "Sessões de Votação e Votos - V1", description = "Operações relacionadas a sessões de votação e registro de votos (Versão 1)")
 public class SessaoVotoController {
 
 	@Autowired

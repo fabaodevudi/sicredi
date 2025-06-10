@@ -1,4 +1,4 @@
-package votacao.scredi.controller;
+package votacao.scredi.controller.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,8 +21,8 @@ import votacao.scredi.service.AssociadoService;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/associados", produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "Associados", description = "Operações relacionadas a Associados")
+@RequestMapping(path = "/v1/associados", produces = MediaType.APPLICATION_JSON_VALUE) // Adicionado o '/v1'
+@Tag(name = "Associados - V1", description = "Operações relacionadas a Associados (Versão 1)")
 public class AssociadoController {
 
 	@Autowired

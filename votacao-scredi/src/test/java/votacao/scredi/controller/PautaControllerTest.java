@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import votacao.scredi.builders.PautaBuilder;
+import votacao.scredi.controller.v1.PautaController;
 import votacao.scredi.dto.PautaDTO;
 import votacao.scredi.exception.AssociadoExisteException;
 import votacao.scredi.exception.AssociadoNaoExisteException;
@@ -36,7 +37,7 @@ public class PautaControllerTest {
 
 		doNothing().when(service).criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalarioSemId().getPauta()));
 
-		mockMvc.perform(post("/pautas")
+		mockMvc.perform(post("/v1/pautas")
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isCreated());
@@ -53,7 +54,7 @@ public class PautaControllerTest {
 		doThrow(AssociadoExisteException.class).when(service)
 				.criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalarioSemId().getPauta()));
 
-		mockMvc.perform(post("/pautas")
+		mockMvc.perform(post("/v1/pautas")
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isUnprocessableEntity());
@@ -67,7 +68,7 @@ public class PautaControllerTest {
 
 		doNothing().when(service).deletar(1L);
 
-		mockMvc.perform(delete(String.format("/pautas/%s", 1L)))
+		mockMvc.perform(delete(String.format("/v1/pautas/%s", 1L)))
 				.andExpect(status().isNoContent());
 		verify(service,times(1)).deletar(1L);
 	}
@@ -78,7 +79,7 @@ public class PautaControllerTest {
 
 		doThrow(AssociadoNaoExisteException.class).when(service).deletar(5L);
 
-		mockMvc.perform(delete(String.format("/pautas/%s", 5L)))
+		mockMvc.perform(delete(String.format("/v1/pautas/%s", 5L)))
 				.andExpect(status().isNotFound());
 		verify(service,times(1)).deletar(5L);
 	}
@@ -92,7 +93,7 @@ public class PautaControllerTest {
         when(service.obterPorId(PautaBuilder.pautaAumentoSalario().getPauta().getId()))
 				.thenReturn(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()));
 
-		mockMvc.perform(get(String.format("/pautas/%s", PautaBuilder.pautaAumentoSalario().getPauta().getId()))
+		mockMvc.perform(get(String.format("/v1/pautas/%s", PautaBuilder.pautaAumentoSalario().getPauta().getId()))
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isOk());
@@ -105,7 +106,7 @@ public class PautaControllerTest {
 		
 		doThrow(AssociadoNaoExisteException.class).when(service).obterPorId(88L);
 
-		mockMvc.perform(get(String.format("/pautas/%s", 88L)))
+		mockMvc.perform(get(String.format("/v1/pautas/%s", 88L)))
 		.andExpect(status().isNotFound());
 		verify(service,times(1)).obterPorId(88L);
 	}
@@ -122,7 +123,7 @@ public class PautaControllerTest {
 		
 		when(service.listar()).thenReturn(lista);
 
-        mockMvc.perform(get("/pautas")
+        mockMvc.perform(get("/v1/pautas")
                         .contentType(APPLICATION_JSON)
                         .content(jsonBody))
                 .andExpect(status().isOk());

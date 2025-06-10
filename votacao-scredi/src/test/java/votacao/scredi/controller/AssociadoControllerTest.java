@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import votacao.scredi.builders.AssociadoBuilder;
+import votacao.scredi.controller.v1.AssociadoController;
 import votacao.scredi.dto.AssociadoDTO;
 import votacao.scredi.exception.AssociadoExisteException;
 import votacao.scredi.exception.AssociadoNaoExisteException;
@@ -37,7 +38,7 @@ public class AssociadoControllerTest {
 
 		doNothing().when(service).criar(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoSemId().getAssociado()));
 
-		mockMvc.perform(post("/associados")
+		mockMvc.perform(post("/v1/associados")
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isCreated());
@@ -53,7 +54,7 @@ public class AssociadoControllerTest {
 		doThrow(AssociadoExisteException.class).when(service)
 				.criar(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoSemId().getAssociado()));
 
-		mockMvc.perform(post("/associados")
+		mockMvc.perform(post("/v1/associados")
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isUnprocessableEntity());
@@ -67,7 +68,7 @@ public class AssociadoControllerTest {
 
 		doNothing().when(service).deletar(1L);
 
-		mockMvc.perform(delete(String.format("/associados/%s", 1L)))
+		mockMvc.perform(delete(String.format("/v1/associados/%s", 1L)))
 				.andExpect(status().isNoContent());
 		verify(service,times(1)).deletar(1L);
 	}
@@ -78,7 +79,7 @@ public class AssociadoControllerTest {
 
 		doThrow(AssociadoNaoExisteException.class).when(service).deletar(5L);
 
-		mockMvc.perform(delete(String.format("/associados/%s", 5L)))
+		mockMvc.perform(delete(String.format("/v1/associados/%s", 5L)))
 				.andExpect(status().isNotFound());
 		verify(service,times(1)).deletar(5L);
 	}
@@ -92,7 +93,7 @@ public class AssociadoControllerTest {
         when(service.obterPorCpf(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()).getCpf()))
 				.thenReturn(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()));
 
-		mockMvc.perform(get(String.format("/associados/buscar/%s", AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
+		mockMvc.perform(get(String.format("/v1/associados/buscar/%s", AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isOk());
@@ -105,7 +106,7 @@ public class AssociadoControllerTest {
 		
 		doThrow(AssociadoNaoExisteException.class).when(service).obterPorCpf("555555555555");
 
-		mockMvc.perform(get(String.format("/associados/buscar/%s", "555555555555")))
+		mockMvc.perform(get(String.format("/v1/associados/buscar/%s", "555555555555")))
 		.andExpect(status().isNotFound());
 		verify(service,times(1)).obterPorCpf("555555555555");
 	}
@@ -122,7 +123,7 @@ public class AssociadoControllerTest {
 		
 		when(service.listar()).thenReturn(lista);
 
-        mockMvc.perform(get("/associados")
+        mockMvc.perform(get("/v1/associados")
                         .contentType(APPLICATION_JSON)
                         .content(jsonBody))
                 .andExpect(status().isOk());

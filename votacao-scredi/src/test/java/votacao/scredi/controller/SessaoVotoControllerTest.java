@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import votacao.scredi.builders.VotoBuilder;
+import votacao.scredi.controller.v1.SessaoVotoController;
 import votacao.scredi.dto.PautaDTO;
 import votacao.scredi.dto.VotoDTO;
 import votacao.scredi.entity.Pauta;
@@ -41,7 +42,7 @@ public class SessaoVotoControllerTest {
 		pauta.setId(ID);
         doNothing().when(service).criar(PautaDTO.fromEntity(pauta));
         
-        mockMvc.perform(post("/sessoes")
+        mockMvc.perform(post("/v1/sessoes")
                 .param("idPauta","1"))
                 .andExpect(status().isCreated());
         verify(service, times(1)).criar(PautaDTO.fromEntity(pauta));
@@ -54,7 +55,7 @@ public class SessaoVotoControllerTest {
 
         doNothing().when(service).votar(org.mockito.ArgumentMatchers.eq(ID), org.mockito.ArgumentMatchers.any(votacao.scredi.entity.Voto.class));
         
-        mockMvc.perform(post(String.format("/sessoes/%s/voto", ID))
+        mockMvc.perform(post(String.format("/v1/sessoes/%s/voto", ID))
 		        .contentType(APPLICATION_JSON)
 				.content(jsonBody))
                 .andExpect(status().isCreated());

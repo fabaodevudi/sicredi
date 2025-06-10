@@ -1,4 +1,4 @@
-package votacao.scredi.controller;
+package votacao.scredi.controller.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,8 +21,8 @@ import votacao.scredi.service.PautaService;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/pautas", produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "Pautas", description = "Operações relacionadas a Pautas de votação")
+@RequestMapping(path = "/v1/pautas", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Pautas - V1", description = "Operações relacionadas a Pautas de votação (Versão 1)")
 public class PautaController {
 
 	@Autowired

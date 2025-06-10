@@ -38,7 +38,7 @@ public class ServicoValidacaoCpfController {
     @GetMapping("/{cpf}")
     public ResponseEntity<RespostaValidacaoCpfDTO> validarCpf(@Parameter(description = "CPF a ser validado") @PathVariable String cpf) {
 
-        if (random.nextInt(10) == 0) {
+        if (random.nextInt(10) == 0) { //10% de chance do CPF nem existir
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
