@@ -44,7 +44,7 @@ Na raiz do projeto (`/votacao-scredi`), execute o seguinte comando para limpar o
 ```bash
 mvn clean install -U
 
-### Limpeza de Checksums do Liquibase (Importante na primeira execução ou após atualização)
+Limpeza de Checksums do Liquibase (Importante na primeira execução ou após atualização)
 Se houver erros de checksum do Liquibase (Validation Failed: X changesets check sum), execute:
 
 Bash
@@ -66,7 +66,7 @@ Na raiz do projeto (/votacao-scredi), execute:
 Bash
 
 mvn test
-### Documentação da API (Swagger UI)
+Documentação da API (Swagger UI)
 Com a aplicação rodando, acesse a documentação interativa da API em:
 
 http://localhost:8080/swagger-ui.html
