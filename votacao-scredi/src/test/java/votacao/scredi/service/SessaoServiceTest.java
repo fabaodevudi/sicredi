@@ -1,5 +1,12 @@
 package votacao.scredi.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,10 +30,8 @@ import votacao.scredi.repository.SessaoRepository;
 import votacao.scredi.repository.VotoRepository;
 import votacao.scredi.service.impl.SessaoServiceImpl;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SessaoServiceTest {
@@ -64,19 +69,23 @@ public class SessaoServiceTest {
     @Test
     @DisplayName("Deve abrir nova sessao")
     void deveAbrirNovaSessao() {
+        // Cenário: Uma pauta válida existe
         when(pautaService.obterPorId(ID)).thenReturn(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()));
         when(rep.save(any())).thenReturn(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao());
 
+        // Ação: Criar sessão
         service.criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()));
 
+        // Verificação: Garante que o save foi chamado
         verify(rep, times(1)).save(any());
+        // Garante que obterPorId da pauta foi chamado
         verify(pautaService, times(1)).obterPorId(ID);
-
     }
 
     @Test
     @DisplayName("Deve salvar voto quando CPF habilitado")
     void deveSalvarVotoQuandoCpfHabilitado(){
+        // Cenário: Uma sessão e um associado existem e o CPF do usuário é válido
         RespostaValidacaoCpfDTO respostaHabilitado = new RespostaValidacaoCpfDTO();
         respostaHabilitado.setStatus(StatusValidacaoCpfEnum.HABILITADO_PARA_VOTAR);
 
@@ -87,8 +96,11 @@ public class SessaoServiceTest {
                 .thenReturn(respostaHabilitado);
         when(votoRep.save(any())).thenReturn(VotoBuilder.votoSim().getVoto());
 
+        // Ação: Chamar o método 'votar' do serviço com um voto.
         service.votar(ID,VotoBuilder.votoSim().getVoto());
 
+        // Verificação:
+        // Garante o voto foi salvo
         verify(rep, times(1)).findById(ID);
         verify(associadoService, times(1)).obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
         verify(clienteValidacaoCpf, times(1)).validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
@@ -98,6 +110,7 @@ public class SessaoServiceTest {
     @Test
     @DisplayName("Deve lancar excecao quando CPF nao habilitado")
     void deveLancarExcecaoQuandoCpfNaoHabilitado() {
+        // Cenário: sessão e associado existe e CPF inválido
         RespostaValidacaoCpfDTO respostaNaoHabilitado = new RespostaValidacaoCpfDTO();
         respostaNaoHabilitado.setStatus(StatusValidacaoCpfEnum.NAO_HABILITADO_PARA_VOTAR);
 
@@ -106,10 +119,12 @@ public class SessaoServiceTest {
                 .thenReturn(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()));
         when(clienteValidacaoCpf.validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(respostaNaoHabilitado);
 
-        org.junit.jupiter.api.Assertions.assertThrows(CpfNaoHabilitadoParaVotoException.class, () -> {
+        // Ação e Verificação: CpfNaoHabilitadoParaVotoException deve ser lançada
+        assertThrows(CpfNaoHabilitadoParaVotoException.class, () -> {
             service.votar(ID, VotoBuilder.votoSim().getVoto());
         });
 
+        // Garante que save do rep de voto NÃO foi chamado.
         verify(rep, times(1)).findById(ID);
         verify(associadoService, times(1)).obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
         verify(clienteValidacaoCpf, times(1)).validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
@@ -119,21 +134,23 @@ public class SessaoServiceTest {
     @Test
     @DisplayName("Deve lancar excecao quando CPF nao encontrado no servico externo")
     void deveLancarExcecaoQuandoCpfNaoEncontradoExternamente() {
-        // Cenario: CPF nao encontrado no servico externo (simula 404)
+        // Cenário: sessão e um associado existe e o CPF é inválido no serviço externo (serviço fake)
         when(rep.findById(ID)).thenReturn(Optional.of(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao()));
         when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
                 .thenReturn(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()));
+        // Ação: Mocka o cliente para lançar a exceção de CPF inválido
         when(clienteValidacaoCpf.validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
                 .thenThrow(new CpfNaoEncontradoNoServicoExternoException("CPF não encontrado no serviço externo."));
 
-        org.junit.jupiter.api.Assertions.assertThrows(CpfNaoEncontradoNoServicoExternoException.class, () -> {
+        // Verificação: verifica se exceção foi lançada
+        assertThrows(CpfNaoEncontradoNoServicoExternoException.class, () -> {
             service.votar(ID, VotoBuilder.votoSim().getVoto());
         });
+
 
         verify(rep, times(1)).findById(ID);
         verify(associadoService, times(1)).obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
         verify(clienteValidacaoCpf, times(1)).validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
-        verify(votoRep, times(0)).save(any());
+        verify(votoRep, times(0)).save(any());// Garante que o método save do rep de voto NÃO foi chamado.
     }
-
 }
