@@ -43,3 +43,30 @@ Na raiz do projeto (`/votacao-scredi`), execute o seguinte comando para limpar o
 
 ```bash
 mvn clean install -U
+
+### Limpeza de Checksums do Liquibase (Importante na primeira execução ou após atualização)
+Se houver erros de checksum do Liquibase (Validation Failed: X changesets check sum), execute:
+
+Bash
+
+mvn liquibase:clearCheckSums
+Isso resetará os checksums do Liquibase no banco de dados para corresponder aos arquivos de changelog atuais.
+
+Como Rodar a Aplicação
+Na raiz do projeto (/votacao-scredi), execute:
+
+Bash
+
+mvn spring-boot:run
+A aplicação estará acessível em http://localhost:8080.
+
+Como Rodar os Testes
+Na raiz do projeto (/votacao-scredi), execute:
+
+Bash
+
+mvn test
+### Documentação da API (Swagger UI)
+Com a aplicação rodando, acesse a documentação interativa da API em:
+
+http://localhost:8080/swagger-ui.html
