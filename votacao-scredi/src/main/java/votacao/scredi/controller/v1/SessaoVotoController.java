@@ -21,7 +21,7 @@ import votacao.scredi.service.SessaoService;
 
 
 @RestController
-@RequestMapping(path = "/v1/sessoes", produces = MediaType.APPLICATION_JSON_VALUE) // Adicionado o '/v1'
+@RequestMapping(path = "/v1/sessoes", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Sessões de Votação e Votos - V1", description = "Operações relacionadas a sessões de votação e registro de votos (Versão 1)")
 public class SessaoVotoController {
 

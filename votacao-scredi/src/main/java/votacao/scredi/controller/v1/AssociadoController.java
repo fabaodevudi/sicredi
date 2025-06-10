@@ -21,7 +21,7 @@ import votacao.scredi.service.AssociadoService;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/v1/associados", produces = MediaType.APPLICATION_JSON_VALUE) // Adicionado o '/v1'
+@RequestMapping(path = "/v1/associados", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Associados - V1", description = "Operações relacionadas a Associados (Versão 1)")
 public class AssociadoController {
 
