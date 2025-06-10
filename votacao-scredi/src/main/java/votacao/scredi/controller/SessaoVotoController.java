@@ -19,8 +19,6 @@ import votacao.scredi.exception.PautaNaoExisteException;
 import votacao.scredi.exception.handler.ErrorDetalhes;
 import votacao.scredi.service.SessaoService;
 
-import java.util.stream.Collectors;
-
 
 @RestController
 @RequestMapping(path = "/sessoes", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,7 +38,7 @@ public class SessaoVotoController {
 	ResponseEntity<?> criar(@Parameter(description = "ID da pauta para a qual a sessão será aberta") @RequestParam Long idPauta) throws PautaNaoExisteException {
 		PautaDTO dto = new PautaDTO();
 		dto.setId(idPauta);
-		service.criar(PautaDTO.fromDTO(dto));
+		service.criar(dto);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -52,7 +50,7 @@ public class SessaoVotoController {
 	})
 	@GetMapping
 	ResponseEntity<?> listar() throws Exception {
-		return ResponseEntity.ok(service.listar().stream().map(item -> SessaoDTO.fromEntity(item)).collect(Collectors.toList()));
+		return ResponseEntity.ok(service.listar());
 	}
 
 	@Operation(summary = "Busca uma sessão de votação por ID", description = "Retorna uma sessão específica com base no ID.")
@@ -64,7 +62,7 @@ public class SessaoVotoController {
 	})
 	@GetMapping("/{id}")
 	ResponseEntity<?> obter(@Parameter(description = "ID da sessão a ser buscada") @PathVariable Long id) throws Exception {
-		return ResponseEntity.ok(SessaoDTO.fromEntity(service.obterPorId(id)));
+		return ResponseEntity.ok(service.obterPorId(id));
 	}
 
 	@Operation(summary = "Registra um voto em uma sessão", description = "Registra o voto de um associado em uma sessão de votação específica.")

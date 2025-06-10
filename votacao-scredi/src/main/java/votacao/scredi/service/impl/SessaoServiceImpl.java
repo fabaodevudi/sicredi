@@ -2,12 +2,16 @@ package votacao.scredi.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import votacao.scredi.client.ClienteValidacaoCpf;
+import votacao.scredi.dto.AssociadoDTO;
+import votacao.scredi.dto.PautaDTO;
 import votacao.scredi.dto.RespostaValidacaoCpfDTO;
+import votacao.scredi.dto.SessaoDTO;
 import votacao.scredi.entity.Associado;
 import votacao.scredi.entity.Pauta;
 import votacao.scredi.entity.Sessao;
@@ -41,19 +45,23 @@ public class SessaoServiceImpl implements SessaoService {
 	private ClienteValidacaoCpf clienteValidacaoCpf;
 	
 	@Override
-	public List<Sessao> listar() {
-		return (List<Sessao>) rep.findAll();
+	public List<SessaoDTO> listar() {
+		List<Sessao> lista = (List<Sessao>) rep.findAll();
+		return lista.stream()
+				.map(SessaoDTO::fromEntity)
+				.collect(Collectors.toList());
 	}
 
 	@Override
-	public Sessao obterPorId(Long id) {		
-		return rep.findById(id).orElseThrow(() -> new SessaoNaoExisteException("Sessão não existe"));
+	public SessaoDTO obterPorId(Long id) {
+		Sessao sessao = rep.findById(id).orElseThrow(() -> new SessaoNaoExisteException("Sessão não existe"));
+		return SessaoDTO.fromEntity(sessao);
 	}
 
 	@Override
-	public void criar(Pauta pauta) {
+	public void criar(PautaDTO pauta) {
 		pautaRep.obterPorId(pauta.getId());
-		Sessao sessao = new Sessao(pauta);
+		Sessao sessao = new Sessao(PautaDTO.fromDTO(pauta));
 		rep.save(sessao);		
 	}
 
@@ -61,13 +69,13 @@ public class SessaoServiceImpl implements SessaoService {
 	public void votar(Long idSessao, Voto voto) {
 
 		LocalDateTime fim = LocalDateTime.now();
-		Sessao sessao = obterPorId(idSessao);
+		Sessao sessao = SessaoDTO.fromDTO(obterPorId(idSessao));
 		
 		if (fim.isAfter(sessao.getFinalSessao())) {
 			throw new SessaoException("Sessão já está encerrada");
 		}
 		
-		Associado associado = associadoRep.obterPorCpf(voto.getAssociado().getCpf());
+		Associado associado = AssociadoDTO.fromDTO(associadoRep.obterPorCpf(voto.getAssociado().getCpf()));
 
 		RespostaValidacaoCpfDTO respostaValidacao = clienteValidacaoCpf.validarCpf(associado.getCpf());
 

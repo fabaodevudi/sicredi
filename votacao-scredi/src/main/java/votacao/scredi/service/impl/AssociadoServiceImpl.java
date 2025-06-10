@@ -2,10 +2,12 @@ package votacao.scredi.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import votacao.scredi.dto.AssociadoDTO;
 import votacao.scredi.entity.Associado;
 import votacao.scredi.exception.AssociadoNaoExisteException;
 import votacao.scredi.exception.AssociadoExisteException;
@@ -19,8 +21,12 @@ public class AssociadoServiceImpl implements AssociadoService {
 	AssociadoRepository rep;
 	
 	@Override
-	public List<Associado> listar() {		
-		return (List<Associado>) rep.findAll();
+	public List<AssociadoDTO> listar() {
+		List<Associado> lista = (List<Associado>) rep.findAll();
+
+		return lista.stream()
+				.map(AssociadoDTO::fromEntity)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -29,12 +35,12 @@ public class AssociadoServiceImpl implements AssociadoService {
 	}
 
 	@Override
-	public void criar(Associado associado) {
+	public void criar(AssociadoDTO associado) {
 		rep.findByCpf(associado.getCpf()).ifPresent(item -> {
 			throw new AssociadoExisteException("Associado já existente com Cpf: " + associado.getCpf());
         });		
 		
-		rep.save(associado);		
+		rep.save(AssociadoDTO.fromDTO(associado));
 	}
 
 	@Override
@@ -44,14 +50,14 @@ public class AssociadoServiceImpl implements AssociadoService {
 	}
 
 	@Override
-	public Associado obterPorCpf(String cpf) {
+	public AssociadoDTO obterPorCpf(String cpf) {
 		Optional<Associado> associado = rep.findByCpf(cpf);
 		
 		if (!associado.isPresent()) {
 			throw new AssociadoNaoExisteException("Usuário inexistente");
 		}
 		
-		return associado.get();
+		return AssociadoDTO.fromEntity(associado.get());
 	}
 
 }

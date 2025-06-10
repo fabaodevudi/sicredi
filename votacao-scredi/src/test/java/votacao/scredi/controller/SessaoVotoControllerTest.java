@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import votacao.scredi.builders.VotoBuilder;
+import votacao.scredi.dto.PautaDTO;
 import votacao.scredi.dto.VotoDTO;
 import votacao.scredi.entity.Pauta;
 import votacao.scredi.service.SessaoService;
@@ -38,12 +39,12 @@ public class SessaoVotoControllerTest {
 				
 		Pauta pauta = new Pauta();
 		pauta.setId(ID);
-        doNothing().when(service).criar(pauta);
+        doNothing().when(service).criar(PautaDTO.fromEntity(pauta));
         
         mockMvc.perform(post("/sessoes")
                 .param("idPauta","1"))
                 .andExpect(status().isCreated());
-        verify(service, times(1)).criar(pauta);
+        verify(service, times(1)).criar(PautaDTO.fromEntity(pauta));
     }
 	
 	@Test

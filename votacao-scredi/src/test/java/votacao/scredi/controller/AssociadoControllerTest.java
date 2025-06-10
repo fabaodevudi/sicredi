@@ -1,35 +1,25 @@
 package votacao.scredi.controller;
 
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import com.google.gson.Gson;
-
 import votacao.scredi.builders.AssociadoBuilder;
-import votacao.scredi.controller.AssociadoController;
 import votacao.scredi.dto.AssociadoDTO;
 import votacao.scredi.exception.AssociadoExisteException;
 import votacao.scredi.exception.AssociadoNaoExisteException;
 import votacao.scredi.service.AssociadoService;
+
+import java.util.List;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = AssociadoController.class)
 public class AssociadoControllerTest {
@@ -45,13 +35,14 @@ public class AssociadoControllerTest {
 	void deveRetornar201CasoSucesso() throws Exception {
 		String jsonBody = new Gson().toJson(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoSemId().getAssociado()));
 
-		doNothing().when(service).criar(AssociadoBuilder.fabaoSemId().getAssociado());
+		doNothing().when(service).criar(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoSemId().getAssociado()));
 
 		mockMvc.perform(post("/associados")
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isCreated());
-		verify(service,times(1)).criar(AssociadoBuilder.fabaoSemId().getAssociado());
+		verify(service,times(1)).criar(AssociadoDTO
+				.fromEntity(AssociadoBuilder.fabaoSemId().getAssociado()));
 	}
 
 	@Test
@@ -59,13 +50,15 @@ public class AssociadoControllerTest {
 	void deveRetornar422CasoUsuarioExista() throws Exception {
 		String jsonBody = new Gson().toJson(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoSemId().getAssociado()));
 
-		doThrow(AssociadoExisteException.class).when(service).criar(AssociadoBuilder.fabaoSemId().getAssociado());
+		doThrow(AssociadoExisteException.class).when(service)
+				.criar(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoSemId().getAssociado()));
 
 		mockMvc.perform(post("/associados")
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isUnprocessableEntity());
-		verify(service,times(1)).criar(AssociadoBuilder.fabaoSemId().getAssociado());
+		verify(service,times(1)).criar(AssociadoDTO
+				.fromEntity(AssociadoBuilder.fabaoSemId().getAssociado()));
 	}
 	
 	@Test
@@ -96,7 +89,8 @@ public class AssociadoControllerTest {
 
 		String jsonBody = new Gson().toJson(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()));
 		
-        when(service.obterPorCpf(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()).getCpf())).thenReturn(AssociadoBuilder.fabaoId1().getAssociado());
+        when(service.obterPorCpf(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()).getCpf()))
+				.thenReturn(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()));
 
 		mockMvc.perform(get(String.format("/associados/buscar/%s", AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
 				.contentType(APPLICATION_JSON)
@@ -126,7 +120,7 @@ public class AssociadoControllerTest {
 
 		String jsonBody = new Gson().toJson(lista);
 		
-		when(service.listar()).thenReturn(lista.stream().map(item -> AssociadoDTO.fromDTO(item)).collect(Collectors.toList()));
+		when(service.listar()).thenReturn(lista);
 
         mockMvc.perform(get("/associados")
                         .contentType(APPLICATION_JSON)

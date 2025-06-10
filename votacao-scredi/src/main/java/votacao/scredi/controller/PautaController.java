@@ -19,7 +19,6 @@ import votacao.scredi.exception.handler.ErrorDetalhes;
 import votacao.scredi.service.PautaService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/pautas", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -37,7 +36,7 @@ public class PautaController {
 	})
 	@PostMapping
 	ResponseEntity<?> criar(@RequestBody PautaDTO pauta) throws PautaExisteException {
-		service.criar(PautaDTO.fromDTO(pauta));
+		service.criar(pauta);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -49,7 +48,7 @@ public class PautaController {
 	})
 	@GetMapping
 	ResponseEntity<?> listar() throws PautaException {
-		List<PautaDTO> lista = service.listar().stream().map(item -> PautaDTO.fromEntity(item)).collect(Collectors.toList());
+		List<PautaDTO> lista = service.listar();
 		return ResponseEntity.ok(lista);
 	}
 
@@ -74,7 +73,7 @@ public class PautaController {
 	})
 	@GetMapping("/{id}")
 	ResponseEntity<?> obter(@Parameter(description = "ID da pauta a ser buscada") @PathVariable Long id) throws PautaException {
-		return ResponseEntity.ok(PautaDTO.fromEntity(service.obterPorId(id)));
+		return ResponseEntity.ok(service.obterPorId(id));
 	}
 
 }

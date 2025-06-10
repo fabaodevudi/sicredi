@@ -1,34 +1,24 @@
 package votacao.scredi.controller;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import com.google.gson.Gson;
-
 import votacao.scredi.builders.PautaBuilder;
-import votacao.scredi.controller.PautaController;
 import votacao.scredi.dto.PautaDTO;
 import votacao.scredi.exception.AssociadoExisteException;
 import votacao.scredi.exception.AssociadoNaoExisteException;
 import votacao.scredi.service.PautaService;
+
+import java.util.List;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PautaController.class)
 public class PautaControllerTest {
@@ -44,13 +34,14 @@ public class PautaControllerTest {
 	void deveRetornar201CasoSucesso() throws Exception {
 		String jsonBody = new Gson().toJson(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalarioSemId().getPauta()));
 
-		doNothing().when(service).criar(PautaBuilder.pautaAumentoSalarioSemId().getPauta());
+		doNothing().when(service).criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalarioSemId().getPauta()));
 
 		mockMvc.perform(post("/pautas")
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isCreated());
-		verify(service,times(1)).criar(PautaBuilder.pautaAumentoSalarioSemId().getPauta());
+		verify(service,times(1))
+				.criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalarioSemId().getPauta()));
 	}	
 	
 	
@@ -59,13 +50,15 @@ public class PautaControllerTest {
 	void deveRetornar422CasoUsuarioExista() throws Exception {
 		String jsonBody = new Gson().toJson(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalarioSemId().getPauta()));
 
-		doThrow(AssociadoExisteException.class).when(service).criar(PautaBuilder.pautaAumentoSalarioSemId().getPauta());
+		doThrow(AssociadoExisteException.class).when(service)
+				.criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalarioSemId().getPauta()));
 
 		mockMvc.perform(post("/pautas")
 				.contentType(APPLICATION_JSON)
 				.content(jsonBody))
 		.andExpect(status().isUnprocessableEntity());
-		verify(service,times(1)).criar(PautaBuilder.pautaAumentoSalarioSemId().getPauta());
+		verify(service,times(1))
+				.criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalarioSemId().getPauta()));
 	}
 	
 	@Test
@@ -96,7 +89,8 @@ public class PautaControllerTest {
 
 		String jsonBody = new Gson().toJson(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()));
 		
-        when(service.obterPorId(PautaBuilder.pautaAumentoSalario().getPauta().getId())).thenReturn(PautaBuilder.pautaAumentoSalario().getPauta());
+        when(service.obterPorId(PautaBuilder.pautaAumentoSalario().getPauta().getId()))
+				.thenReturn(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()));
 
 		mockMvc.perform(get(String.format("/pautas/%s", PautaBuilder.pautaAumentoSalario().getPauta().getId()))
 				.contentType(APPLICATION_JSON)
@@ -126,7 +120,7 @@ public class PautaControllerTest {
 
 		String jsonBody = new Gson().toJson(lista);
 		
-		when(service.listar()).thenReturn(lista.stream().map(item -> PautaDTO.fromDTO(item)).collect(Collectors.toList()));
+		when(service.listar()).thenReturn(lista);
 
         mockMvc.perform(get("/pautas")
                         .contentType(APPLICATION_JSON)

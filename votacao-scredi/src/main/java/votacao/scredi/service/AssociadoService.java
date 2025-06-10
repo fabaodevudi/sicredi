@@ -4,14 +4,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import votacao.scredi.dto.AssociadoDTO;
 import votacao.scredi.entity.Associado;
 
 
 @Service
 public interface AssociadoService {
-	List<Associado> listar();
+	List<AssociadoDTO> listar();
 	Associado obterPorId(Long id);
-	void criar(Associado associado);
+	void criar(AssociadoDTO associado);
 	void deletar(Long id);
-	Associado obterPorCpf(String cpf);
+	AssociadoDTO obterPorCpf(String cpf);
 }

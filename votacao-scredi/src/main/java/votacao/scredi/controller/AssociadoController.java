@@ -19,7 +19,6 @@ import votacao.scredi.exception.handler.ErrorDetalhes;
 import votacao.scredi.service.AssociadoService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/associados", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -37,7 +36,7 @@ public class AssociadoController {
 	})
 	@PostMapping
 	ResponseEntity<?> criar(@RequestBody AssociadoDTO associado) throws AssociadoExisteException {
-		service.criar(AssociadoDTO.fromDTO(associado));
+		service.criar(associado);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -49,7 +48,7 @@ public class AssociadoController {
 	})
 	@GetMapping
 	ResponseEntity<?> listar() throws AssociadoExisteException {
-		List<AssociadoDTO> lista = service.listar().stream().map(item -> AssociadoDTO.fromEntity(item)).collect(Collectors.toList());
+		List<AssociadoDTO> lista = service.listar();
 		return new ResponseEntity<>(lista, HttpStatus.OK);
 	}
 

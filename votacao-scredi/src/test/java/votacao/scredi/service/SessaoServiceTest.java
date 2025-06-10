@@ -13,6 +13,8 @@ import votacao.scredi.builders.PautaBuilder;
 import votacao.scredi.builders.SessaoBuilder;
 import votacao.scredi.builders.VotoBuilder;
 import votacao.scredi.client.ClienteValidacaoCpf;
+import votacao.scredi.dto.AssociadoDTO;
+import votacao.scredi.dto.PautaDTO;
 import votacao.scredi.dto.RespostaValidacaoCpfDTO;
 import votacao.scredi.enumerate.StatusValidacaoCpfEnum;
 import votacao.scredi.exception.CpfNaoEncontradoNoServicoExternoException;
@@ -62,10 +64,10 @@ public class SessaoServiceTest {
     @Test
     @DisplayName("Deve abrir nova sessao")
     void deveAbrirNovaSessao() {
-        when(pautaService.obterPorId(ID)).thenReturn(PautaBuilder.pautaAumentoSalario().getPauta());
+        when(pautaService.obterPorId(ID)).thenReturn(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()));
         when(rep.save(any())).thenReturn(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao());
 
-        service.criar(PautaBuilder.pautaAumentoSalario().getPauta());
+        service.criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()));
 
         verify(rep, times(1)).save(any());
         verify(pautaService, times(1)).obterPorId(ID);
@@ -79,8 +81,10 @@ public class SessaoServiceTest {
         respostaHabilitado.setStatus(StatusValidacaoCpfEnum.HABILITADO_PARA_VOTAR);
 
         when(rep.findById(ID)).thenReturn(Optional.of(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao()));
-        when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(AssociadoBuilder.fabaoId1().getAssociado());
-        when(clienteValidacaoCpf.validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(respostaHabilitado);
+        when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
+                .thenReturn(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()));
+        when(clienteValidacaoCpf.validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
+                .thenReturn(respostaHabilitado);
         when(votoRep.save(any())).thenReturn(VotoBuilder.votoSim().getVoto());
 
         service.votar(ID,VotoBuilder.votoSim().getVoto());
@@ -98,7 +102,8 @@ public class SessaoServiceTest {
         respostaNaoHabilitado.setStatus(StatusValidacaoCpfEnum.NAO_HABILITADO_PARA_VOTAR);
 
         when(rep.findById(ID)).thenReturn(Optional.of(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao()));
-        when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(AssociadoBuilder.fabaoId1().getAssociado());
+        when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
+                .thenReturn(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()));
         when(clienteValidacaoCpf.validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(respostaNaoHabilitado);
 
         org.junit.jupiter.api.Assertions.assertThrows(CpfNaoHabilitadoParaVotoException.class, () -> {
@@ -116,7 +121,8 @@ public class SessaoServiceTest {
     void deveLancarExcecaoQuandoCpfNaoEncontradoExternamente() {
         // Cenario: CPF nao encontrado no servico externo (simula 404)
         when(rep.findById(ID)).thenReturn(Optional.of(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao()));
-        when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(AssociadoBuilder.fabaoId1().getAssociado());
+        when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
+                .thenReturn(AssociadoDTO.fromEntity(AssociadoBuilder.fabaoId1().getAssociado()));
         when(clienteValidacaoCpf.validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
                 .thenThrow(new CpfNaoEncontradoNoServicoExternoException("CPF não encontrado no serviço externo."));
 
