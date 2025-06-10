@@ -12,6 +12,11 @@ import votacao.scredi.builders.AssociadoBuilder;
 import votacao.scredi.builders.PautaBuilder;
 import votacao.scredi.builders.SessaoBuilder;
 import votacao.scredi.builders.VotoBuilder;
+import votacao.scredi.client.ClienteValidacaoCpf;
+import votacao.scredi.dto.RespostaValidacaoCpfDTO;
+import votacao.scredi.enumerate.StatusValidacaoCpfEnum;
+import votacao.scredi.exception.CpfNaoEncontradoNoServicoExternoException;
+import votacao.scredi.exception.CpfNaoHabilitadoParaVotoException;
 import votacao.scredi.repository.SessaoRepository;
 import votacao.scredi.repository.VotoRepository;
 import votacao.scredi.service.impl.SessaoServiceImpl;
@@ -41,6 +46,9 @@ public class SessaoServiceTest {
     @Mock
     private PautaService pautaService;
 
+    @Mock
+    private ClienteValidacaoCpf clienteValidacaoCpf;
+
 
     @BeforeEach
     void setUp() {
@@ -48,6 +56,7 @@ public class SessaoServiceTest {
         ReflectionTestUtils.setField(service, "votoRep", votoRep);
         ReflectionTestUtils.setField(service, "associadoRep", associadoService);
         ReflectionTestUtils.setField(service, "pautaRep", pautaService);
+        ReflectionTestUtils.setField(service, "clienteValidacaoCpf", clienteValidacaoCpf);
     }
 
     @Test
@@ -64,18 +73,61 @@ public class SessaoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve salvar voto")
-    void deveSalvarVoto(){
+    @DisplayName("Deve salvar voto quando CPF habilitado")
+    void deveSalvarVotoQuandoCpfHabilitado(){
+        RespostaValidacaoCpfDTO respostaHabilitado = new RespostaValidacaoCpfDTO();
+        respostaHabilitado.setStatus(StatusValidacaoCpfEnum.HABILITADO_PARA_VOTAR);
+
         when(rep.findById(ID)).thenReturn(Optional.of(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao()));
         when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(AssociadoBuilder.fabaoId1().getAssociado());
-
+        when(clienteValidacaoCpf.validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(respostaHabilitado);
         when(votoRep.save(any())).thenReturn(VotoBuilder.votoSim().getVoto());
 
         service.votar(ID,VotoBuilder.votoSim().getVoto());
 
         verify(rep, times(1)).findById(ID);
         verify(associadoService, times(1)).obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
+        verify(clienteValidacaoCpf, times(1)).validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
         verify(votoRep, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lancar excecao quando CPF nao habilitado")
+    void deveLancarExcecaoQuandoCpfNaoHabilitado() {
+        RespostaValidacaoCpfDTO respostaNaoHabilitado = new RespostaValidacaoCpfDTO();
+        respostaNaoHabilitado.setStatus(StatusValidacaoCpfEnum.NAO_HABILITADO_PARA_VOTAR);
+
+        when(rep.findById(ID)).thenReturn(Optional.of(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao()));
+        when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(AssociadoBuilder.fabaoId1().getAssociado());
+        when(clienteValidacaoCpf.validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(respostaNaoHabilitado);
+
+        org.junit.jupiter.api.Assertions.assertThrows(CpfNaoHabilitadoParaVotoException.class, () -> {
+            service.votar(ID, VotoBuilder.votoSim().getVoto());
+        });
+
+        verify(rep, times(1)).findById(ID);
+        verify(associadoService, times(1)).obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
+        verify(clienteValidacaoCpf, times(1)).validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
+        verify(votoRep, times(0)).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lancar excecao quando CPF nao encontrado no servico externo")
+    void deveLancarExcecaoQuandoCpfNaoEncontradoExternamente() {
+        // Cenario: CPF nao encontrado no servico externo (simula 404)
+        when(rep.findById(ID)).thenReturn(Optional.of(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao()));
+        when(associadoService.obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf())).thenReturn(AssociadoBuilder.fabaoId1().getAssociado());
+        when(clienteValidacaoCpf.validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf()))
+                .thenThrow(new CpfNaoEncontradoNoServicoExternoException("CPF não encontrado no serviço externo."));
+
+        org.junit.jupiter.api.Assertions.assertThrows(CpfNaoEncontradoNoServicoExternoException.class, () -> {
+            service.votar(ID, VotoBuilder.votoSim().getVoto());
+        });
+
+        verify(rep, times(1)).findById(ID);
+        verify(associadoService, times(1)).obterPorCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
+        verify(clienteValidacaoCpf, times(1)).validarCpf(AssociadoBuilder.fabaoId1().getAssociado().getCpf());
+        verify(votoRep, times(0)).save(any());
     }
 
 }

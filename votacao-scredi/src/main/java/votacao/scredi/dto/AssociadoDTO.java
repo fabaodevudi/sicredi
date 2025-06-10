@@ -1,5 +1,7 @@
 package votacao.scredi.dto;
 
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import votacao.scredi.entity.Associado;
@@ -9,7 +11,10 @@ import votacao.scredi.entity.Associado;
 public class AssociadoDTO {
 	
     private Long id;  
-    private String nome;    
+    private String nome;
+
+	@Pattern(regexp = "^\\d{11}$", message = "CPF deve conter 11 dígitos numéricos.")
+	@Size(min = 11, max = 11, message = "CPF deve ter exatamente 11 dígitos.")
     private String cpf;
     
     public static AssociadoDTO fromEntity(Associado entity) {
