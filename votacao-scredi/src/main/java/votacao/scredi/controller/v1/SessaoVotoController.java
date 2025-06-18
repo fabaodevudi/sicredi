@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import votacao.scredi.dto.PautaDTO;
+import votacao.scredi.dto.ResultadoVotacaoDTO;
 import votacao.scredi.dto.SessaoDTO;
 import votacao.scredi.dto.VotoDTO;
 import votacao.scredi.exception.PautaNaoExisteException;
@@ -28,17 +29,18 @@ public class SessaoVotoController {
 	@Autowired
 	SessaoService service;
 
-	@Operation(summary = "Abre uma nova sessão de votação para uma pauta", description = "Cria uma sessão de votação, associando-a a uma pauta existente. A sessão tem duração padrão de 1 minuto.")
+	@Operation(summary = "Abre uma nova sessão de votação para uma pauta", description = "Cria uma sessão de votação, associando-a a uma pauta existente. A sessão tem duração padrão de 1 minuto, ou um tempo determinado.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "Sessão criada com sucesso"),
 			@ApiResponse(responseCode = "404", description = "Pauta não encontrada",
 					content = @Content(schema = @Schema(implementation = ErrorDetalhes.class)))
 	})
 	@PostMapping
-	ResponseEntity<?> criar(@Parameter(description = "ID da pauta para a qual a sessão será aberta") @RequestParam Long idPauta) throws PautaNaoExisteException {
+	ResponseEntity<?> criar(@Parameter(description = "ID da pauta para a qual a sessão será aberta") @RequestParam Long idPauta,
+							@Parameter(description = "Duração da sessão em minutos (padrão: 1 minuto)") @RequestParam(required = false) Long duracaoMinutos) throws PautaNaoExisteException {
 		PautaDTO dto = new PautaDTO();
 		dto.setId(idPauta);
-		service.criar(dto);
+		service.criar(dto, duracaoMinutos);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
@@ -78,6 +80,19 @@ public class SessaoVotoController {
 							@RequestBody VotoDTO voto) {
 		service.votar(id, VotoDTO.fromDTO(voto));
 		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+
+	@Operation(summary = "Consolida os votos de uma sessão", description = "Retorna o resultado da votação (total de votos Sim e Não) para uma sessão específica.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Resultado da votação retornado com sucesso",
+					content = @Content(schema = @Schema(implementation = ResultadoVotacaoDTO.class))),
+			@ApiResponse(responseCode = "404", description = "Sessão não encontrada",
+					content = @Content(schema = @Schema(implementation = ErrorDetalhes.class)))
+	})
+	@GetMapping("/{id}/resultado")
+	ResponseEntity<ResultadoVotacaoDTO> obterResultadoVotacao(@Parameter(description = "ID da sessão para consolidar os votos") @PathVariable Long id) {
+		ResultadoVotacaoDTO resultado = service.consolidarVotos(id);
+		return ResponseEntity.ok(resultado);
 	}
 
 }

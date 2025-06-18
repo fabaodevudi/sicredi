@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import votacao.scredi.client.ClienteValidacaoCpf;
-import votacao.scredi.dto.AssociadoDTO;
-import votacao.scredi.dto.PautaDTO;
-import votacao.scredi.dto.RespostaValidacaoCpfDTO;
-import votacao.scredi.dto.SessaoDTO;
+import votacao.scredi.dto.*;
 import votacao.scredi.entity.Associado;
 import votacao.scredi.entity.Pauta;
 import votacao.scredi.entity.Sessao;
@@ -59,10 +56,10 @@ public class SessaoServiceImpl implements SessaoService {
 	}
 
 	@Override
-	public void criar(PautaDTO pauta) {
+	public void criar(PautaDTO pauta, Long duracaoMinutos) {
 		pautaRep.obterPorId(pauta.getId());
-		Sessao sessao = new Sessao(PautaDTO.fromDTO(pauta));
-		rep.save(sessao);		
+		Sessao sessao = new Sessao(PautaDTO.fromDTO(pauta), duracaoMinutos);
+		rep.save(sessao);
 	}
 
 	@Override
@@ -86,11 +83,15 @@ public class SessaoServiceImpl implements SessaoService {
 		if (sessao.getVotos() != null && sessao.getVotos().stream().anyMatch(item -> item.getAssociado().getCpf().equals(associado.getCpf()))) {			
 			throw new SessaoException("O associado já votou.");
 		}
-
 		
 		voto.setSessao(sessao);
 		voto.setAssociado(associado);
-		votoRep.save(voto);				
+		votoRep.save(voto);
+	}
+
+	@Override
+	public ResultadoVotacaoDTO consolidarVotos(Long idSessao) {
+		return rep.consolidarVotosPorSessao(idSessao);
 	}
 
 }

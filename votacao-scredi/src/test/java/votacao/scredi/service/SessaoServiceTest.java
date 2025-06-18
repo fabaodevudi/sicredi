@@ -23,6 +23,7 @@ import votacao.scredi.client.ClienteValidacaoCpf;
 import votacao.scredi.dto.AssociadoDTO;
 import votacao.scredi.dto.PautaDTO;
 import votacao.scredi.dto.RespostaValidacaoCpfDTO;
+import votacao.scredi.entity.Sessao;
 import votacao.scredi.enumerate.StatusValidacaoCpfEnum;
 import votacao.scredi.exception.CpfNaoEncontradoNoServicoExternoException;
 import votacao.scredi.exception.CpfNaoHabilitadoParaVotoException;
@@ -67,19 +68,41 @@ public class SessaoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve abrir nova sessao")
-    void deveAbrirNovaSessao() {
-        // Cenário: Uma pauta válida existe
+    @DisplayName("Deve abrir nova sessao com duracao padrao de 1 minuto")
+    void deveAbrirNovaSessaoComDuracaoPadrao() {
+
         when(pautaService.obterPorId(ID)).thenReturn(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()));
         when(rep.save(any())).thenReturn(SessaoBuilder.abreSessaoPautaAumentoSalario().getSessao());
 
         // Ação: Criar sessão
-        service.criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()));
+        service.criar(PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta()), null); // duracaoMinutos = null para usar o padrão
 
         // Verificação: Garante que o save foi chamado
         verify(rep, times(1)).save(any());
-        // Garante que obterPorId da pauta foi chamado
+        verify(pautaService, times(1)).obterPorId(ID);// Garante que obterPorId da pauta foi chamado
+
+    }
+
+    @Test
+    @DisplayName("Deve abrir nova sessao com duracao determinada")
+    void deveAbrirNovaSessaoComDuracaoDeterminada() {
+        // Cenário: Uma sessão e um associado existem e o CPF do usuário é válido
+        PautaDTO pautaDTO = PautaDTO.fromEntity(PautaBuilder.pautaAumentoSalario().getPauta());
+        Long duracaoDeterminada = 5L; // 5 minutos
+
+        Sessao sessaoMock = new Sessao(PautaBuilder.pautaAumentoSalario().getPauta(), duracaoDeterminada);
+        sessaoMock.setId(ID);
+
+        when(pautaService.obterPorId(ID)).thenReturn(pautaDTO);
+        when(rep.save(any(Sessao.class))).thenReturn(sessaoMock);
+
+        // Ação: Criar sessão
+        service.criar(pautaDTO, duracaoDeterminada);
+
+        // Verificação: Garante que o save foi chamado
+        verify(rep, times(1)).save(any());
         verify(pautaService, times(1)).obterPorId(ID);
+
     }
 
     @Test

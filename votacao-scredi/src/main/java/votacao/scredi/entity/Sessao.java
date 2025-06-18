@@ -27,10 +27,18 @@ public class Sessao {
     private LocalDateTime finalSessao = LocalDateTime.now().plusMinutes(1);
 
     @OneToMany(mappedBy = "sessao", cascade = {CascadeType.ALL})
-    private List<Voto> votos;    
-    
+    private List<Voto> votos;
+
+    public Sessao(Pauta pauta, Long duracaoMinutos) {
+        this.pauta = pauta;
+        this.inicioSessao = LocalDateTime.now();
+        this.finalSessao = this.inicioSessao.plusMinutes(duracaoMinutos != null && duracaoMinutos > 0 ? duracaoMinutos : 1);
+    }
+
     public Sessao(Pauta pauta) {
-    	this.pauta = pauta;
+        this.pauta = pauta;
+        this.inicioSessao = LocalDateTime.now();
+        this.finalSessao = this.inicioSessao.plusMinutes(1);
     }
 
 }
