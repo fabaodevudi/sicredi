@@ -1,63 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <databaseChangeLog
-	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-	 <changeSet author="Fabao" id="1_createTablePauta" failOnError="true">
-		
-        <comment>Criação da tabela PAUTA</comment>
-        <sql>
-			create table PAUTA (
-				ID_PAUTA bigint auto_increment,
-				TITULO VARCHAR(100),
-				DESCRICAO VARCHAR(100),
-				PRIMARY KEY (ID_PAUTA)
+	<changeSet author="Fabao" id="1_createTablePauta" failOnError="true">
+		<sql>
+			create table pauta (
+			id_pauta bigint auto_increment,
+			titulo VARCHAR(100),
+			descricao VARCHAR(100),
+			PRIMARY KEY (id_pauta)
 			)
 		</sql>
-    </changeSet>
-    
-    <changeSet author="Fabao" id="2_createTableAssociado" failOnError="true">
-		
-        <comment>Criação da tabela ASSOCIADO</comment>
-        <sql>
-			create table ASSOCIADO (
-				ID_ASSOCIADO bigint auto_increment,
-				NOME VARCHAR(100),
-				CPF VARCHAR(11),
-				PRIMARY KEY (ID_ASSOCIADO)
+	</changeSet>
+
+	<changeSet author="Fabao" id="2_createTableAssociado" failOnError="true">
+		<sql>
+			create table associado (
+			id_associado bigint auto_increment,
+			nome VARCHAR(100),
+			cpf VARCHAR(11),
+			PRIMARY KEY (id_associado)
 			)
 		</sql>
-    </changeSet>
-    <changeSet author="Fabao" id="3_createTableSessao" failOnError="true">
-		
-        <comment>Criação da tabela SESSAO</comment>
-        <sql>
-			create table SESSAO (
-				ID_SESSAO bigint  auto_increment,
-				INICIO_SESSAO DATETIME,
-				FIM_SESSAO DATETIME,
-				ID_PAUTA bigint,
-				PRIMARY KEY (ID_SESSAO),
-				FOREIGN KEY (ID_PAUTA) REFERENCES PAUTA(ID_PAUTA)
+	</changeSet>
+
+	<changeSet author="Fabao" id="3_createTableSessao" failOnError="true">
+		<sql>
+			create table sessao (
+			id_sessao bigint  auto_increment,
+			inicio_sessao DATETIME,
+			fim_sessao DATETIME,
+			id_pauta bigint,
+			PRIMARY KEY (id_sessao),
+			FOREIGN KEY (id_pauta) REFERENCES pauta(id_pauta)
 			)
 		</sql>
-    </changeSet>
-    <changeSet author="Fabao" id="3_createTableVoto" failOnError="true">
-		
-        <comment>Criação da tabela VOTO</comment>
-        <sql>
-			create table VOTO (
-				ID_VOTO bigint auto_increment,				
-				VOTO VARCHAR(3),
-				ID_SESSAO bigint,
-				ID_ASSOCIADO bigint,
-				PRIMARY KEY (ID_VOTO),				
-				FOREIGN KEY (ID_SESSAO) REFERENCES SESSAO(ID_SESSAO),
-				FOREIGN KEY (ID_ASSOCIADO) REFERENCES ASSOCIADO(ID_ASSOCIADO)				
+	</changeSet>
+
+	<changeSet author="Fabao" id="3_createTableVoto" failOnError="true">
+		<sql>
+			create table voto (
+			id_voto bigint auto_increment,
+			voto VARCHAR(3),
+			id_sessao bigint,
+			id_associado bigint,
+			PRIMARY KEY (id_voto),
+			FOREIGN KEY (id_sessao) REFERENCES sessao(id_sessao),
+			FOREIGN KEY (id_associado) REFERENCES associado(id_associado)
 			)
 		</sql>
-    </changeSet>
+	</changeSet>
 </databaseChangeLog>
