@@ -78,6 +78,8 @@ Isso resetará os checksums do Liquibase no banco de dados para corresponder aos
 
 ## 🏃 Como Rodar a Aplicação
 
+### Opção 1: Execução Local (Maven)
+
 Na raiz do projeto (`/votacao-scredi`), execute:
 
 ```bash
@@ -85,6 +87,115 @@ mvn spring-boot:run
 ```
 
 A aplicação estará acessível em `http://localhost:8080`.
+
+### Opção 2: Execução com Docker
+
+O projeto inclui suporte completo para Docker, facilitando a execução sem necessidade de instalar Java, Maven ou MySQL localmente.
+
+#### Pré-requisitos para Docker
+
+* **Docker** instalado e rodando
+* **Docker Compose** (opcional, mas recomendado)
+
+#### Executando com Docker Compose (Recomendado)
+
+Na pasta `votacao-scredi`, execute:
+
+```bash
+docker-compose up -d
+```
+
+Isso irá:
+- Criar e iniciar o container MySQL
+- Criar e iniciar o container da aplicação Spring Boot
+- Configurar automaticamente a rede entre os containers
+- Executar as migrações do Liquibase
+
+A aplicação estará acessível em `http://localhost:8080` (ou na porta configurada no docker-compose.yml).
+
+Para parar os containers:
+
+```bash
+docker-compose down
+```
+
+Para parar e remover os volumes (dados do banco):
+
+```bash
+docker-compose down -v
+```
+
+#### Executando com Docker Manualmente
+
+1. **Criar a rede Docker:**
+
+```bash
+docker network create sicredi-network
+```
+
+2. **Iniciar o MySQL:**
+
+```bash
+docker run -d --name sicredi-mysql \
+  --network sicredi-network \
+  -e MYSQL_ROOT_PASSWORD=1234 \
+  -e MYSQL_DATABASE=sicredi \
+  -p 3306:3306 \
+  mysql:8.0
+```
+
+3. **Aguardar o MySQL inicializar (aproximadamente 10-15 segundos)**
+
+4. **Build da imagem da aplicação:**
+
+Na pasta `votacao-scredi`, execute:
+
+```bash
+docker build -t votacao-scredi:latest .
+```
+
+5. **Executar o container da aplicação:**
+
+```bash
+docker run -d --name votacao-scredi-app \
+  --network sicredi-network \
+  -e SPRING_DATASOURCE_URL="jdbc:mysql://sicredi-mysql:3306/sicredi?serverTimezone=America/Sao_Paulo&createDatabaseIfNotExist=true" \
+  -e SPRING_DATASOURCE_USERNAME=root \
+  -e SPRING_DATASOURCE_PASSWORD=1234 \
+  -e URL_SERVICO_VALIDACAO_CPF="http://host.docker.internal:8080/servico-validacao-cpf-externo" \
+  -p 8080:8080 \
+  votacao-scredi:latest
+```
+
+#### Verificando os Containers
+
+Para verificar o status dos containers:
+
+```bash
+docker ps
+```
+
+Para ver os logs da aplicação:
+
+```bash
+docker logs votacao-scredi-app -f
+```
+
+Para ver os logs do MySQL:
+
+```bash
+docker logs sicredi-mysql -f
+```
+
+#### Características do Dockerfile
+
+O Dockerfile utiliza **multi-stage build** para otimizar o tamanho da imagem final:
+
+- **Stage 1 (Build)**: Usa imagem Maven para compilar a aplicação
+- **Stage 2 (Runtime)**: Usa imagem Alpine minimalista com apenas JRE
+- **Segurança**: Executa como usuário não-root
+- **Healthcheck**: Configurado para verificar a saúde da aplicação
+- **Tamanho otimizado**: Imagem final reduzida usando Alpine Linux
 
 ## 🧪 Como Rodar os Testes
 
@@ -100,6 +211,8 @@ Com a aplicação rodando, acesse a documentação interativa da API em:
 
 **http://localhost:8080/swagger-ui.html**
 
+> **Nota**: Se estiver usando Docker e a porta foi mapeada para outra (ex: 8083), ajuste a URL accordingly.
+
 A documentação Swagger permite testar todos os endpoints da API de forma interativa.
 
 ## 📁 Estrutura do Projeto
@@ -111,6 +224,8 @@ sicredi/
 │   ├── 02-fluxo-sistema.md        # Fluxos do sistema em ASCII
 │   └── 03-estorias-usuario.md     # Estórias de usuário
 ├── votacao-scredi/                # Projeto principal
+│   ├── Dockerfile                 # Dockerfile para containerização
+│   ├── docker-compose.yml        # Configuração Docker Compose
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/

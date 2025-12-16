@@ -6,10 +6,18 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: sicredi
+      MYSQL_USER: sicredi
+      MYSQL_PASSWORD: 1234
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p1234"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   app:
     build:
@@ -20,21 +28,20 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/sicredi?serverTimezone=America/Sao_Paulo
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/sicredi?serverTimezone=America/Sao_Paulo&createDatabaseIfNotExist=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 1234
-      # ATENÇÃO AQUI: Ajustar esta URL
+      # URL do serviço externo de validação de CPF
       URL_SERVICO_VALIDACAO_CPF: http://host.docker.internal:8080/servico-validacao-cpf-externo
-
-
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD" ]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/swagger-ui.html"]
+      interval: 30s
+      timeout: 10s
       retries: 5
-
+      start_period: 60s
 
 volumes:
   mysql_data:
